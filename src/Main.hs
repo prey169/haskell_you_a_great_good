@@ -1,3 +1,7 @@
+import Text.Read (readMaybe)
+import System.IO  
+
+
 doubleMe x = x + x
 doubleUs x y = x * 2 + y * 2
 doubleSmallNumber x = if x > 100
@@ -27,7 +31,7 @@ addThree :: Int -> Int -> Int -> Int
 addThree x y z = x + y + z
 
 factorial :: Integer -> Integer
-factorial n = product [1..n]
+factorial n = n * factorial (n - 1)
 
 circumference :: Float -> Float
 circumference r = 2 * pi * r
@@ -39,3 +43,49 @@ lowestInt = minBound :: Int
 largestChar = maxBound :: Char
 
 largestInTuple = maxBound :: (Bool, Int, Char)
+
+first :: (a, b, c) -> a
+first (x, _, _) = x
+
+head' :: [a] -> a
+head' [] = error "Can't do that baka!"
+head'(x:_) = x
+
+length'' :: (Num b) => [a] -> b
+length'' [] = 0
+length'' (_:xs) = 1 + length'' xs
+
+sum' :: (Num a) => [a] -> a
+sum' [] = 0
+sum' (x:xs) = x + sum' xs
+
+-- Guards are fancy match statements
+densityTell :: (RealFloat a) => a -> String
+densityTell density
+  | density <= 1.2 = "Wow! You're going for a ride in the sky!"
+  | density <= 1000.0 = "Have fun swimming, but watch out for sharks!"
+  | otherwise = "If it's sink or swim, you're going to sink."
+
+densityTell' :: String -> String
+densityTell' input
+  | Just density <- readMaybe input :: Maybe Float, density <= 1.2 = "Wow! You're going for a ride in the sky!"
+  | Just density <- readMaybe input :: Maybe Float, density  <= 1000.0 = "Have fun swimming, but watch out for sharks"
+  | Nothing <- readMaybe input :: Maybe Float = "You know I need a density, right?"
+  | otherwise = "If it's sink or swim, you're going to sink."
+
+densityTell'' :: (RealFloat a) => a -> a -> String
+densityTell'' mass volume
+  | density <= air = "Wow! You're going for a ride in the sky!"
+  | density <= water = "Have fun swimming, but watch out for sharks!"
+  | otherwise = "If it's sink or swim, you're going to sink."
+  where density = mass / volume
+        (air, water) = (1.2, 1000.0)
+
+cylinder :: (RealFloat a) => a -> a -> a
+cylinder r h =
+  let sideArea = 2 * pi * r * h
+      topArea = pi * r^2
+  in sideArea + 2 * topArea
+
+calcDensities :: (RealFloat a) => [(a, a)] -> [a]
+calcDensities xs = [density | (m, v) <- xs, let density = m / v]
