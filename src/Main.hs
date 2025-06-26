@@ -1,7 +1,6 @@
 import Text.Read (readMaybe)
 import System.IO  
 
-
 doubleMe x = x + x
 doubleUs x y = x * 2 + y * 2
 doubleSmallNumber x = if x > 100
@@ -90,9 +89,96 @@ cylinder r h =
 calcDensities :: (RealFloat a) => [(a, a)] -> [a]
 calcDensities xs = [density | (m, v) <- xs, let density = m / v]
 
+-- quicksort :: (Ord a) => [a] -> [a]
+-- quicksort [] = []
+-- quicksort (x:xs) =
+--  let smallerSorted = quicksort [a | a <- xs, a <= x]
+--      biggerSorted = quicksort [a | a <- xs, a > x]
+--  in smallerSorted ++ [x] ++ biggerSorted
+
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]  
+zipWith' _ [] _ = []  
+zipWith' _ _ [] = []  
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+
+
 quicksort :: (Ord a) => [a] -> [a]
 quicksort [] = []
 quicksort (x:xs) =
-  let smallerSorted = quicksort [a | a <- xs, a <= x]
-      biggerSorted = quicksort [a | a <- xs, a > x]
+  let smallerSorted = quicksort (filter (<=x) xs)
+      biggerSorted = quicksort (filter (>x) xs)
   in smallerSorted ++ [x] ++ biggerSorted
+
+largestDivisible :: (Integral a) => a
+largestDivisible = head (filter p [100000,99999..])
+  where p x = x `mod` 3829 == 0
+
+-- Both of these are the same
+-- sum (takeWhile (< 10000) (filter odd (map (^2) [1..])))
+-- but with list conprehensions....
+-- sum (takeWhile (< 10000) [n^2 | n <- [1..], odd (n^2)])
+chain :: (Integral a) => a -> [a]
+chain 1 = [1]
+chain n 
+    | even n = n:chain (n `div` 2)
+    | odd n = n:chain (n*3 + 1)
+
+numLongChains :: Int 
+numLongChains = length (filter isLong (map chain [1..100]))
+  where isLong xs = length xs > 15
+
+-- we can also use lambdas to express the same thing
+-- numLongChains = length (filter (\xs -> length xs > 15) (map chain [1..100]))
+-- 
+-- we can take any number of parameters
+-- zipWith (\a b -> (a * 30 + 3) /b) [5,4,3,2,1][1,2,3,4,5]
+--
+-- and pattern match
+-- map (\(a, b) -> a + b) [(1,2),(3,5),(6,3),(2,6),(2,5)]
+
+-- these 2 are equivalent
+-- addThree x y z = x + y + z
+-- and the following (but dont actually use that lol)
+-- addThree = \x -> \y -> \z -> x + y + z
+--
+-- but sometimes it makes sense such as
+flip' :: (a -> b -> c) -> b -> a -> c
+flip' f = \x y -> f y x
+
+sum'' :: (Num a) => [a] -> a
+sum'' xs = foldl (\acc x -> acc + x) 0 xs
+
+sum''' :: (Num a) => [a] -> a
+sum''' xs = foldl (+) 0 xs
+
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' y ys = foldl (\acc x -> if x == y then True else acc) False ys
+
+-- we could also use the right fold below, but for new lists 
+-- it is cheaper to use a right fold as the left fold would 
+-- require the ++ operator and its more expensive than the :
+map' :: (a -> b) -> [a] -> [b]
+map' f xs = foldr (\x acc -> f x: acc) [] xs
+
+-- scanl and scanr are the same as folds, but also shows elements 
+-- from each step within the fold 
+-- scanl (+) 0 [3,5,2,1]
+-- would output: [0,3,8,10,11]
+-- and scanr (+) 0 [3,5,2,1]
+-- would output [11, 8, 5, 3, 0]
+sqrtSums :: Int
+sqrtSums = length (takeWhile (< 1000)(scanl1 (+) (map sqrt[1..]))) + 1
+-- $ lets us rewrite the above as 
+-- sqrtSums = length (takeWhile (< 1000) $ scanl1 (+) $ map sqrt[1..] ) + 1
+-- $ is also a function so the following works
+-- map ($ 3) [(4+), (10*), (^2), sqrt]
+--
+-- Just putting notes for the (.) function composition operator as well
+-- This is similar to doing this after that, for example:
+-- x = square . (+x)
+-- instead of x y = square (add x y)
+--
+-- Sum from earlier can omit the xs because of currying and
+sum'''' :: (Num a) => [a] -> a
+sum'''' = foldl (+) 0
+
