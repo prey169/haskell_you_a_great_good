@@ -1,0 +1,19 @@
+import Text.Read (readMaybe)
+import System.IO
+import Data.List
+-- if we only needed nub and sort we can do:
+-- import Data.List (nub, sort)
+--
+-- otherwise - if we want EVERYTHING EXCEPT nub we can do:
+-- import Data.List hiding (nub)
+--
+-- Lastly, if we have 2 conflicting module names, we can force 
+-- using the full path using the qualified keyword or giving 
+-- a nickname such as either of these
+-- import qualified Data.List
+--   this would be Data.List.nub
+-- import qualified Data.List as M
+--   this would be M.nub
+
+numsUniques :: (Eq a) => [a] -> Int
+numsUniques = length . nub
