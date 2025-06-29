@@ -1,6 +1,9 @@
 import Text.Read (readMaybe)
 import System.IO
 import Data.List
+import Geometry.Sphere as Sphere
+import Geometry.Cuboid as Cuboid
+import Geometry.Cube as Cube
 -- if we only needed nub and sort we can do:
 -- import Data.List (nub, sort)
 --
